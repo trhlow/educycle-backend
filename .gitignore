@@ -1,20 +1,3 @@
-# Visual Studio
 .vs/
-
-# Build results
 bin/
 obj/
-
-# User-specific files
-*.user
-*.suo
-*.cache
-*.log
-
-# Rider / VSCode
-.idea/
-.vscode/
-
-# OS
-.DS_Store
-Thumbs.db

@@ -1,4 +1,4 @@
-using EduCycle.Api.Domain.Entities;
+﻿using EduCycle.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduCycle.Api.Infrastructure.Data;
@@ -46,5 +46,13 @@ public class EduCycleDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+        modelBuilder.Entity<Category>().HasData(
+            new Category { Id = 1, Name = "Giáo trình đại cương" },
+            new Category { Id = 2, Name = "Chuyên ngành CNTT" },
+            new Category { Id = 3, Name = "Kinh tế - Quản trị" },
+            new Category { Id = 4, Name = "Ngoại ngữ" },
+            new Category { Id = 5, Name = "Khác" }
+        );
+
     }
 }

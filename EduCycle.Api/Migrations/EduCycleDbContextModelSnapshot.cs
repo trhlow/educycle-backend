@@ -37,6 +37,33 @@ namespace EduCycle.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Giáo trình đại cương"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Chuyên ngành CNTT"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Kinh tế - Quản trị"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Ngoại ngữ"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Khác"
+                        });
                 });
 
             modelBuilder.Entity("EduCycle.Api.Domain.Entities.Message", b =>
