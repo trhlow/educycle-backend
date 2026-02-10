@@ -1,4 +1,5 @@
-﻿using EduCycle.Application.Interfaces;
+﻿using EduCycle.Api.Middleware;
+using EduCycle.Application.Interfaces;
 using EduCycle.Application.Services;
 using EduCycle.Infrastructure.Authentication;
 using EduCycle.Infrastructure.Data;
@@ -28,8 +29,13 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
