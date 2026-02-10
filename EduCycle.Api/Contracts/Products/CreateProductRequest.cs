@@ -1,8 +1,7 @@
-namespace EduCycle.Api.Contracts.Products;
+namespace EduCycle.Contracts.Products;
 
-public record CreateProductRequest(
-    string Title,
-    string Description,
-    decimal Price,
-    int CategoryId
-);
+public class CreateProductRequest
+{
+    public string Name { get; set; } = null!;
+    public decimal Price { get; set; }
+}

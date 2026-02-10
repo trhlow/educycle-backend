@@ -1,3 +1,5 @@
+using EduCycle.Domain.Entities;
+
 namespace EduCycle.Api.Domain.Entities;
 
 public class Category

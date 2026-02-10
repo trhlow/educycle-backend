@@ -1,19 +1,17 @@
-using EduCycle.Api.Domain.Enums;
+using EduCycle.Domain.Entities;
 
-namespace EduCycle.Api.Domain.Entities;
+namespace EduCycle.Domain.Entities;
 
 public class Transaction
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
-    public int ProductId { get; set; }
-    public Product Product { get; set; } = null!;
-
-    public int BuyerId { get; set; }
+    public Guid BuyerId { get; set; }
     public User Buyer { get; set; } = null!;
 
-    public int SellerId { get; set; }
+    public Guid SellerId { get; set; }
     public User Seller { get; set; } = null!;
 
-    public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
+    public decimal Amount { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
