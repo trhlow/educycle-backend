@@ -1,7 +1,8 @@
-namespace EduCycle.Api.Contracts.Auth;
+namespace EduCycle.Contracts.Auth;
 
-public record RegisterRequest(
-    string Email,
-    string Password,
-    string FullName
-);
+public class RegisterRequest
+{
+    public string Username { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string Password { get; set; } = null!;
+}

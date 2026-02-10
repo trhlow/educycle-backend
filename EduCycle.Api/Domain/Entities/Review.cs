@@ -1,14 +1,21 @@
-namespace EduCycle.Api.Domain.Entities;
+﻿using EduCycle.Domain.Entities;
+
+namespace EduCycle.Domain.Entities;
 
 public class Review
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
-    public int TransactionId { get; set; }
-    public Transaction Transaction { get; set; } = null!;
+    // User viết review
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
 
-    public int ReviewerId { get; set; }
-    public User Reviewer { get; set; } = null!;
+    // Product được review
+    public Guid ProductId { get; set; }
+    public Product Product { get; set; } = null!;
 
-    public int Rating { get; set; } // 1�5
+    public int Rating { get; set; }
+    public string Content { get; set; } = null!;
+
+    public DateTime CreatedAt { get; set; }
 }

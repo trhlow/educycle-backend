@@ -1,12 +1,10 @@
-namespace EduCycle.Api.Domain.Entities;
+namespace EduCycle.Domain.Entities;
 
 public class User
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
+    public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
-    public string FullName { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
-    public double AvgRating { get; set; } = 0;
-
-    public ICollection<Product> Products { get; set; } = new List<Product>();
+    public DateTime CreatedAt { get; set; }
 }

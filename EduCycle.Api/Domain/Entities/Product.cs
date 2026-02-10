@@ -1,18 +1,16 @@
-using EduCycle.Api.Domain.Entities;
+using EduCycle.Domain.Entities;
+
+namespace EduCycle.Domain.Entities;
 
 public class Product
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
-    public string Title { get; set; } = null!;
-    public string Description { get; set; } = null!;
+    public string Name { get; set; } = null!;
     public decimal Price { get; set; }
 
-    public int CategoryId { get; set; }
-    public Category Category { get; set; } = null!;
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
 
-    public int SellerId { get; set; }
-    public User Seller { get; set; } = null!;
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
 }
