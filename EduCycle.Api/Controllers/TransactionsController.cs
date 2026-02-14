@@ -25,9 +25,21 @@ public class TransactionsController : ControllerBase
         return Ok(await _service.CreateAsync(request, buyerId));
     }
 
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        return Ok(await _service.GetByIdAsync(id));
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
+    }
+
+    [HttpPatch("{id:guid}/status")]
+    public async Task<IActionResult> UpdateStatus(Guid id, UpdateTransactionStatusRequest request)
+    {
+        return Ok(await _service.UpdateStatusAsync(id, request));
     }
 }

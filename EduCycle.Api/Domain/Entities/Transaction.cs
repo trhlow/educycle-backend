@@ -1,4 +1,4 @@
-using EduCycle.Domain.Entities;
+using EduCycle.Domain.Enums;
 
 namespace EduCycle.Domain.Entities;
 
@@ -13,5 +13,6 @@ public class Transaction
     public User Seller { get; set; } = null!;
 
     public decimal Amount { get; set; }
+    public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
     public DateTime CreatedAt { get; set; }
 }

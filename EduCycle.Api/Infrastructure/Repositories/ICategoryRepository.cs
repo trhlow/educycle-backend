@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using EduCycle.Domain.Entities;
 
-namespace EduCycle.Api.Infrastructure.Repositories
+namespace EduCycle.Infrastructure.Repositories;
+
+public interface ICategoryRepository
 {
-    internal class ICategoryRepository
-    {
-    }
+    Task AddAsync(Category category);
+    Task<Category?> GetByIdAsync(int id);
+    Task<List<Category>> GetAllAsync();
+    Task UpdateAsync(Category category);
+    Task DeleteAsync(Category category);
 }
