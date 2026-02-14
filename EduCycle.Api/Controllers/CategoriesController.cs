@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/categories")]
-[Authorize]   // 🔒 THÊM DÒNG NÀY
+[Authorize(Roles = "Admin")]
 public class CategoriesController : ControllerBase
 {
 

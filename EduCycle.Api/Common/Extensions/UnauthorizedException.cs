@@ -2,10 +2,10 @@
 
 namespace EduCycle.Common.Exceptions;
 
-public class NotFoundexception : AppException
+public class UnauthorizedException : AppException
 {
-    public NotFoundexception(string message)
-        : base(message, (int)HttpStatusCode.NotFound)
+    public UnauthorizedException(string message)
+        : base(message, (int)HttpStatusCode.Unauthorized)
     {
     }
 }
