@@ -1,6 +1,8 @@
 ﻿using EduCycle.Application.Interfaces;
+using EduCycle.Common.Exceptions;
 using EduCycle.Contracts.Auth;
 using EduCycle.Domain.Entities;
+using EduCycle.Domain.Enums;
 using EduCycle.Infrastructure.Authentication;
 using EduCycle.Infrastructure.Repositories;
 
@@ -22,7 +24,7 @@ public class AuthService : IAuthService
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
         if (await _userRepository.ExistsByEmailAsync(request.Email))
-            throw new Exception("Email already exists");
+            throw new BadRequestException("Email already exists");
 
         var user = new User
         {
@@ -30,6 +32,7 @@ public class AuthService : IAuthService
             Username = request.Username,
             Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Role = Role.User,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -39,23 +42,25 @@ public class AuthService : IAuthService
         {
             UserId = user.Id,
             Email = user.Email,
-            Token = _jwtTokenGenerator.GenerateToken(user)
+            Token = _jwtTokenGenerator.GenerateToken(user),
+            Role = user.Role.ToString()
         };
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
         var user = await _userRepository.GetByEmailAsync(request.Email)
-            ?? throw new Exception("Invalid credentials");
+            ?? throw new UnauthorizedException("Invalid credentials");
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            throw new Exception("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
 
         return new AuthResponse
         {
             UserId = user.Id,
             Email = user.Email,
-            Token = _jwtTokenGenerator.GenerateToken(user)
+            Token = _jwtTokenGenerator.GenerateToken(user),
+            Role = user.Role.ToString()
         };
     }
 }
