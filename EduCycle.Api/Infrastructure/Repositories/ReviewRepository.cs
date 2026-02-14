@@ -19,8 +19,19 @@ public class ReviewRepository : IReviewRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<Review?> GetByIdAsync(Guid id)
+    {
+        return await _context.Reviews.FindAsync(id);
+    }
+
     public async Task<List<Review>> GetAllAsync()
     {
         return await _context.Reviews.AsNoTracking().ToListAsync();
+    }
+
+    public async Task DeleteAsync(Review review)
+    {
+        _context.Reviews.Remove(review);
+        await _context.SaveChangesAsync();
     }
 }

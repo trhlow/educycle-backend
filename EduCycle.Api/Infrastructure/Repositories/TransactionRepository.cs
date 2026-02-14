@@ -19,8 +19,19 @@ public class TransactionRepository : ITransactionRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<Transaction?> GetByIdAsync(Guid id)
+    {
+        return await _context.Transactions.FindAsync(id);
+    }
+
     public async Task<List<Transaction>> GetAllAsync()
     {
         return await _context.Transactions.AsNoTracking().ToListAsync();
+    }
+
+    public async Task UpdateAsync(Transaction transaction)
+    {
+        _context.Transactions.Update(transaction);
+        await _context.SaveChangesAsync();
     }
 }

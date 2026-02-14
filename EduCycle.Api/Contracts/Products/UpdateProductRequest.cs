@@ -1,8 +1,10 @@
-namespace EduCycle.Api.Contracts.Products;
+namespace EduCycle.Contracts.Products;
 
-public record UpdateProductRequest(
-    string Title,
-    string Description,
-    decimal Price,
-    int CategoryId
-);
+public class UpdateProductRequest
+{
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+    public decimal Price { get; set; }
+    public string? ImageUrl { get; set; }
+    public int? CategoryId { get; set; }
+}

@@ -1,4 +1,4 @@
-namespace EduCycle.Api.Domain.Enums;
+namespace EduCycle.Domain.Enums;
 
 public enum TransactionStatus
 {
