@@ -1,6 +1,4 @@
-using EduCycle.Domain.Entities;
-
-namespace EduCycle.Api.Domain.Entities;
+namespace EduCycle.Domain.Entities;
 
 public class Category
 {

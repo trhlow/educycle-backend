@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using EduCycle.Contracts.Categories;
 
-namespace EduCycle.Api.Application.Interfaces
+namespace EduCycle.Application.Interfaces;
+
+public interface ICategoryService
 {
-    internal class ICategoryService
-    {
-    }
+    Task<CategoryResponse> CreateAsync(CreateCategoryRequest request);
+    Task<CategoryResponse> GetByIdAsync(int id);
+    Task<List<CategoryResponse>> GetAllAsync();
+    Task<CategoryResponse> UpdateAsync(int id, CreateCategoryRequest request);
+    Task DeleteAsync(int id);
 }
