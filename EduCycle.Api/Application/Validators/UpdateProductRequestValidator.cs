@@ -9,17 +9,15 @@ public class UpdateProductRequestValidator : AbstractValidator<UpdateProductRequ
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
+            .MinimumLength(5).WithMessage("Name must be at least 5 characters.")
+            .MaximumLength(150).WithMessage("Name must not exceed 150 characters.");
 
         RuleFor(x => x.Description)
-            .MaximumLength(2000).WithMessage("Description must not exceed 2000 characters.")
-            .When(x => x.Description is not null);
+            .MinimumLength(20).WithMessage("Description must be at least 20 characters.")
+            .When(x => !string.IsNullOrEmpty(x.Description));
 
         RuleFor(x => x.Price)
-            .GreaterThan(0).WithMessage("Price must be greater than 0.");
-
-        RuleFor(x => x.CategoryId)
-            .GreaterThan(0).WithMessage("CategoryId must be greater than 0.")
-            .When(x => x.CategoryId.HasValue);
+            .GreaterThan(0).WithMessage("Price must be greater than 0.")
+            .LessThanOrEqualTo(10000000).WithMessage("Price must not exceed 10,000,000.");
     }
 }

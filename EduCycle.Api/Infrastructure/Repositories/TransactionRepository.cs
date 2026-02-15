@@ -21,12 +21,32 @@ public class TransactionRepository : ITransactionRepository
 
     public async Task<Transaction?> GetByIdAsync(Guid id)
     {
-        return await _context.Transactions.FindAsync(id);
+        return await _context.Transactions
+            .Include(t => t.Buyer)
+            .Include(t => t.Seller)
+            .Include(t => t.Product)
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public async Task<List<Transaction>> GetAllAsync()
     {
-        return await _context.Transactions.AsNoTracking().ToListAsync();
+        return await _context.Transactions
+            .Include(t => t.Buyer)
+            .Include(t => t.Seller)
+            .Include(t => t.Product)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<List<Transaction>> GetByUserIdAsync(Guid userId)
+    {
+        return await _context.Transactions
+            .Include(t => t.Buyer)
+            .Include(t => t.Seller)
+            .Include(t => t.Product)
+            .Where(t => t.BuyerId == userId || t.SellerId == userId)
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task UpdateAsync(Transaction transaction)

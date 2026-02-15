@@ -4,6 +4,10 @@ public enum TransactionStatus
 {
     Pending = 0,
     Accepted = 1,
-    Completed = 2,
-    Cancelled = 3
+    Meeting = 2,
+    Completed = 3,
+    AutoCompleted = 4,
+    Rejected = 5,
+    Cancelled = 6,
+    Disputed = 7
 }

@@ -7,6 +7,9 @@ public class CreateTransactionRequestValidator : AbstractValidator<CreateTransac
 {
     public CreateTransactionRequestValidator()
     {
+        RuleFor(x => x.ProductId)
+            .NotEmpty().WithMessage("ProductId is required.");
+
         RuleFor(x => x.SellerId)
             .NotEmpty().WithMessage("SellerId is required.");
 

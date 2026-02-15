@@ -9,5 +9,7 @@ public class User
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
     public Role Role { get; set; } = Role.User;
+    public string? Avatar { get; set; }
+    public string? Bio { get; set; }
     public DateTime CreatedAt { get; set; }
 }
