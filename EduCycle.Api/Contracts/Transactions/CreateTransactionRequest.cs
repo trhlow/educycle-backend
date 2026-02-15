@@ -2,6 +2,7 @@
 
 public class CreateTransactionRequest
 {
+    public Guid ProductId { get; set; }
     public Guid SellerId { get; set; }
     public decimal Amount { get; set; }
 }
