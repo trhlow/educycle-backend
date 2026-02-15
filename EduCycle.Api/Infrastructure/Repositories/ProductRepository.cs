@@ -1,4 +1,5 @@
 ﻿using EduCycle.Domain.Entities;
+using EduCycle.Domain.Enums;
 using EduCycle.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,12 +22,35 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetByIdAsync(Guid id)
     {
-        return await _context.Products.FindAsync(id);
+        return await _context.Products
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<List<Product>> GetAllAsync()
     {
-        return await _context.Products.AsNoTracking().ToListAsync();
+        return await _context.Products
+            .Include(p => p.User)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<List<Product>> GetByStatusAsync(ProductStatus status)
+    {
+        return await _context.Products
+            .Include(p => p.User)
+            .Where(p => p.Status == status)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<List<Product>> GetByUserIdAsync(Guid userId)
+    {
+        return await _context.Products
+            .Include(p => p.User)
+            .Where(p => p.UserId == userId)
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task UpdateAsync(Product product)
