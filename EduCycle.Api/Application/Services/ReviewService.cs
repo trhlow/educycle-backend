@@ -15,9 +15,7 @@ public class ReviewService : IReviewService
         _repository = repository;
     }
 
-    public async Task<ReviewResponse> CreateAsync(
-        CreateReviewRequest request,
-        Guid userId)
+    public async Task<ReviewResponse> CreateAsync(CreateReviewRequest request, Guid userId)
     {
         var review = new Review
         {
@@ -45,7 +43,12 @@ public class ReviewService : IReviewService
     public async Task<List<ReviewResponse>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
+        return list.Select(MapToResponse).ToList();
+    }
 
+    public async Task<List<ReviewResponse>> GetByProductIdAsync(Guid productId)
+    {
+        var list = await _repository.GetByProductIdAsync(productId);
         return list.Select(MapToResponse).ToList();
     }
 
@@ -64,8 +67,10 @@ public class ReviewService : IReviewService
     {
         Id = r.Id,
         UserId = r.UserId,
+        Username = r.User?.Username,
         ProductId = r.ProductId,
         Rating = r.Rating,
-        Content = r.Content
+        Content = r.Content,
+        CreatedAt = r.CreatedAt
     };
 }

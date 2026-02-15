@@ -41,6 +41,7 @@ public class AuthService : IAuthService
         return new AuthResponse
         {
             UserId = user.Id,
+            Username = user.Username,
             Email = user.Email,
             Token = _jwtTokenGenerator.GenerateToken(user),
             Role = user.Role.ToString()
@@ -58,6 +59,7 @@ public class AuthService : IAuthService
         return new AuthResponse
         {
             UserId = user.Id,
+            Username = user.Username,
             Email = user.Email,
             Token = _jwtTokenGenerator.GenerateToken(user),
             Role = user.Role.ToString()

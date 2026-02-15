@@ -16,13 +16,12 @@ public class TransactionService : ITransactionService
         _repository = repository;
     }
 
-    public async Task<TransactionResponse> CreateAsync(
-        CreateTransactionRequest request,
-        Guid buyerId)
+    public async Task<TransactionResponse> CreateAsync(CreateTransactionRequest request, Guid buyerId)
     {
         var transaction = new Transaction
         {
             Id = Guid.NewGuid(),
+            ProductId = request.ProductId,
             BuyerId = buyerId,
             SellerId = request.SellerId,
             Amount = request.Amount,
@@ -32,7 +31,8 @@ public class TransactionService : ITransactionService
 
         await _repository.AddAsync(transaction);
 
-        return MapToResponse(transaction);
+        var full = await _repository.GetByIdAsync(transaction.Id);
+        return MapToResponse(full ?? transaction);
     }
 
     public async Task<TransactionResponse> GetByIdAsync(Guid id)
@@ -46,19 +46,59 @@ public class TransactionService : ITransactionService
     public async Task<List<TransactionResponse>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-
         return list.Select(MapToResponse).ToList();
     }
 
-    public async Task<TransactionResponse> UpdateStatusAsync(
-        Guid id,
-        UpdateTransactionStatusRequest request)
+    public async Task<List<TransactionResponse>> GetMyTransactionsAsync(Guid userId)
+    {
+        var list = await _repository.GetByUserIdAsync(userId);
+        return list.Select(MapToResponse).ToList();
+    }
+
+    public async Task<TransactionResponse> UpdateStatusAsync(Guid id, UpdateTransactionStatusRequest request)
     {
         var transaction = await _repository.GetByIdAsync(id)
             ?? throw new NotFoundException($"Transaction with id '{id}' not found");
 
         transaction.Status = Enum.Parse<TransactionStatus>(request.Status);
+        await _repository.UpdateAsync(transaction);
 
+        return MapToResponse(transaction);
+    }
+
+    public async Task<object> GenerateOtpAsync(Guid id)
+    {
+        var transaction = await _repository.GetByIdAsync(id)
+            ?? throw new NotFoundException($"Transaction with id '{id}' not found");
+
+        var otp = Random.Shared.Next(100000, 999999).ToString();
+        transaction.OtpCode = otp;
+        transaction.OtpExpiresAt = DateTime.UtcNow.AddMinutes(10);
+        await _repository.UpdateAsync(transaction);
+
+        return new { otp };
+    }
+
+    public async Task VerifyOtpAsync(Guid id, string otp)
+    {
+        var transaction = await _repository.GetByIdAsync(id)
+            ?? throw new NotFoundException($"Transaction with id '{id}' not found");
+
+        if (transaction.OtpCode != otp || transaction.OtpExpiresAt < DateTime.UtcNow)
+            throw new BadRequestException("Invalid or expired OTP");
+
+        transaction.OtpCode = null;
+        transaction.OtpExpiresAt = null;
+        transaction.Status = TransactionStatus.Completed;
+        await _repository.UpdateAsync(transaction);
+    }
+
+    public async Task<TransactionResponse> ConfirmReceiptAsync(Guid id)
+    {
+        var transaction = await _repository.GetByIdAsync(id)
+            ?? throw new NotFoundException($"Transaction with id '{id}' not found");
+
+        transaction.Status = TransactionStatus.Completed;
         await _repository.UpdateAsync(transaction);
 
         return MapToResponse(transaction);
@@ -67,8 +107,25 @@ public class TransactionService : ITransactionService
     private static TransactionResponse MapToResponse(Transaction t) => new()
     {
         Id = t.Id,
-        BuyerId = t.BuyerId,
-        SellerId = t.SellerId,
+        Buyer = t.Buyer != null ? new TransactionUserDto
+        {
+            Id = t.Buyer.Id.ToString(),
+            Username = t.Buyer.Username,
+            Email = t.Buyer.Email
+        } : null,
+        Seller = t.Seller != null ? new TransactionUserDto
+        {
+            Id = t.Seller.Id.ToString(),
+            Username = t.Seller.Username,
+            Email = t.Seller.Email
+        } : null,
+        Product = t.Product != null ? new TransactionProductDto
+        {
+            Id = t.Product.Id.ToString(),
+            Name = t.Product.Name,
+            Price = t.Product.Price,
+            ImageUrl = t.Product.ImageUrl
+        } : null,
         Amount = t.Amount,
         Status = t.Status.ToString(),
         CreatedAt = t.CreatedAt
