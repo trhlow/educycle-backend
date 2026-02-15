@@ -1,324 +1,476 @@
-# 🎓 EduCycle Backend API
+# ?? EduCycle Backend API
 
-Nền tảng trao đổi tài liệu / sản phẩm học tập dành cho sinh viên.  
-Backend REST API xây dựng bằng **ASP.NET Core (.NET 10)** theo kiến trúc Clean Architecture.
+N?n t?ng trao ??i s�ch & t�i li?u h?c t?p d�nh cho sinh vi�n.  
+Backend REST API x�y d?ng b?ng **ASP.NET Core (.NET 10)** theo ki?n tr�c Clean Architecture.
 
 ---
 
-## 📋 Mục lục
+## ?? M?c l?c
 
 - [Tech Stack](#-tech-stack)
-- [Kiến trúc dự án](#-kiến-trúc-dự-án)
-- [Cài đặt & Chạy](#-cài-đặt--chạy)
-- [Cấu hình](#-cấu-hình)
+- [Ki?n tr�c d? �n](#-ki?n-tr�c-d?-�n)
+- [C�i ??t & Ch?y](#-c�i-??t--ch?y)
+- [C?u h�nh](#-c?u-h�nh)
 - [API Endpoints](#-api-endpoints)
 - [Authentication & Authorization](#-authentication--authorization)
+- [Admin � Duy?t s?n ph?m](#-admin--duy?t-s?n-ph?m)
 - [Validation](#-validation)
 - [Database Schema](#-database-schema)
-- [Unit Tests](#-unit-tests)
 - [Seed Data](#-seed-data)
 - [Error Response Format](#-error-response-format)
 - [Development Rules](#-development-rules)
 
 ---
 
-## 🛠 Tech Stack
+## ?? Tech Stack
 
-| Công nghệ | Version |
-|---|---|
-| .NET | 10.0 |
-| Entity Framework Core | 10.0.2 |
-| SQL Server | LocalDB / SQL Server |
-| JWT Bearer Authentication | 10.0.2 |
-| FluentValidation | 11.3.1 |
-| BCrypt.Net-Next | 4.0.3 |
-| Swashbuckle (Swagger) | 8.1.1 |
-| xUnit + Moq | Testing |
+| C�ng ngh? | Version | M� t? |
+|---|---|---|
+| .NET | 10.0 | Runtime & SDK |
+| ASP.NET Core | 10.0 | Web API framework |
+| Entity Framework Core | 10.0.2 | ORM + Code-First migrations |
+| SQL Server | LocalDB / SQL Server | Relational database |
+| JWT Bearer | 10.0.2 | Authentication |
+| FluentValidation | 11.3.1 | Request validation |
+| BCrypt.Net-Next | 4.0.3 | Password hashing |
+| Swashbuckle | 8.1.1 | Swagger UI |
 
 ---
 
-## 📁 Kiến trúc dự án
+## ?? Ki?n tr�c d? �n
 
 ```
 EduCycle.Api/
-├── Controllers/             # API Controllers
-│   ├── AuthController.cs
-│   ├── ProductsController.cs
-│   ├── CategoriesController.cs
-│   ├── TransactionsController.cs
-│   └── ReviewsController.cs
-├── Application/
-│   ├── Interfaces/          # Service interfaces
-│   ├── Services/            # Business logic
-│   └── Validators/          # FluentValidation validators
-├── Contracts/               # Request / Response DTOs
-│   ├── Auth/
-│   ├── Products/
-│   ├── Categories/
-│   ├── Transactions/
-│   └── Reviews/
-├── Domain/
-│   ├── Entities/            # EF Core entities
-│   └── Enums/               # Role, TransactionStatus
-├── Infrastructure/
-│   ├── Authentication/      # JWT token generator
-│   ├── Data/                # DbContext + Seed
-│   └── Repositories/        # Data access layer
-├── Common/Extensions/       # Custom exceptions
-├── Middleware/               # Global exception handling
-└── Migrations/              # EF Core migrations
-
-EduCycle.Tests/
-└── Services/                # Unit tests (Auth + Product)
+??? Controllers/               # API Controllers
+?   ??? AuthController.cs
+?   ??? ProductsController.cs
+?   ??? CategoriesController.cs
+?   ??? TransactionsController.cs
+?   ??? ReviewsController.cs
+?   ??? AdminController.cs
+??? Application/
+?   ??? Interfaces/            # Service interfaces
+?   ??? Services/              # Business logic
+?   ??? Validators/            # FluentValidation validators
+??? Contracts/                 # Request / Response DTOs
+?   ??? Auth/
+?   ??? Products/
+?   ??? Categories/
+?   ??? Transactions/
+?   ??? Reviews/
+?   ??? Messages/
+?   ??? Admin/
+??? Domain/
+?   ??? Entities/              # EF Core entities
+?   ??? Enums/                 # Role, ProductStatus, TransactionStatus
+??? Infrastructure/
+?   ??? Data/                  # ApplicationDbContext
+?   ??? Repositories/          # Data access layer
+?   ??? Authentication/        # JWT token generator
+??? Common/Extensions/         # Custom exceptions
+??? Middleware/                 # Exception handling middleware
+??? Migrations/                # EF Core migrations
 ```
 
 ---
 
-## 🚀 Cài đặt & Chạy
+## ?? C�i ??t & Ch?y
 
-### Yêu cầu
+### Y�u c?u
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- SQL Server (LocalDB hoặc SQL Server)
+- SQL Server ho?c LocalDB
 
-### Bước 1 – Clone
+### C�c b??c
 
 ```bash
+# 1. Clone repository
 git clone https://github.com/trhlow/educycle-backend.git
 cd educycle-backend/EduCycle.Api
-```
 
-### Bước 2 – Cấu hình Connection String
+# 2. C?u h�nh connection string (xem ph?n C?u h�nh b�n d??i)
 
-Chỉnh `appsettings.json`:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=.;Database=EduCycleDb;Trusted_Connection=True;TrustServerCertificate=True"
-  }
-}
-```
-
-### Bước 3 – Chạy Migration
-
-```bash
+# 3. Ch?y migration
 dotnet ef database update
-```
 
-### Bước 4 – Chạy API
-
-```bash
+# 4. Ch?y ?ng d?ng
 dotnet run
 ```
 
-Truy cập Swagger UI: **https://localhost:{port}/swagger**
+Swagger UI m?c ??nh: **http://localhost:5000/swagger**
 
 ---
 
-## ⚙ Cấu hình
+## ? C?u h�nh
 
-`appsettings.json`:
+File `appsettings.json`:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=.;Database=EduCycleDb;Trusted_Connection=True;TrustServerCertificate=True"
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=EduCycleDb;Trusted_Connection=True;"
   },
   "Jwt": {
-    "Key": "YOUR_SECRET_KEY_AT_LEAST_32_CHARS",
+    "Key": "your-super-secret-key-at-least-32-characters",
     "Issuer": "EduCycle",
-    "Audience": "EduCycleUsers"
+    "Audience": "EduCycle"
   }
 }
 ```
 
 ---
 
-## 📡 API Endpoints
+## ?? API Endpoints
 
-### Auth
+### ?? Auth � `/api/auth`
 
-| Method | Endpoint | Auth | Mô tả |
+| Method | Endpoint | Auth | M� t? |
 |---|---|---|---|
-| POST | `/api/auth/register` | ❌ | Đăng ký tài khoản |
-| POST | `/api/auth/login` | ❌ | Đăng nhập, trả về JWT |
+| POST | `/api/auth/register` | ? | ??ng k� t�i kho?n m?i |
+| POST | `/api/auth/login` | ? | ??ng nh?p, nh?n JWT token |
 
-### Products
-
-| Method | Endpoint | Auth | Mô tả |
-|---|---|---|---|
-| POST | `/api/products` | 🔒 User | Tạo sản phẩm |
-| GET | `/api/products` | ❌ | Danh sách tất cả sản phẩm |
-| GET | `/api/products/{id}` | ❌ | Chi tiết sản phẩm |
-| PUT | `/api/products/{id}` | 🔒 Owner | Cập nhật sản phẩm (chủ sở hữu) |
-| DELETE | `/api/products/{id}` | 🔒 Owner | Xóa sản phẩm (chủ sở hữu) |
-
-### Categories
-
-| Method | Endpoint | Auth | Mô tả |
-|---|---|---|---|
-| POST | `/api/categories` | 🔒 Admin | Tạo danh mục |
-| GET | `/api/categories` | ❌ | Danh sách danh mục |
-| GET | `/api/categories/{id}` | ❌ | Chi tiết danh mục |
-| PUT | `/api/categories/{id}` | 🔒 Admin | Cập nhật danh mục |
-| DELETE | `/api/categories/{id}` | 🔒 Admin | Xóa danh mục |
-
-### Transactions
-
-| Method | Endpoint | Auth | Mô tả |
-|---|---|---|---|
-| POST | `/api/transactions` | 🔒 User | Tạo giao dịch |
-| GET | `/api/transactions` | 🔒 User | Danh sách giao dịch |
-| GET | `/api/transactions/{id}` | 🔒 User | Chi tiết giao dịch |
-| PATCH | `/api/transactions/{id}/status` | 🔒 User | Cập nhật trạng thái |
-
-**Transaction Status:** `Pending` → `Accepted` → `Completed` | `Cancelled`
-
-### Reviews
-
-| Method | Endpoint | Auth | Mô tả |
-|---|---|---|---|
-| POST | `/api/reviews` | 🔒 User | Viết đánh giá |
-| GET | `/api/reviews` | ❌ | Danh sách đánh giá |
-| GET | `/api/reviews/{id}` | 🔒 User | Chi tiết đánh giá |
-| DELETE | `/api/reviews/{id}` | 🔒 Owner | Xóa đánh giá (chủ sở hữu) |
-
-### Health Check
-
-| Method | Endpoint | Mô tả |
-|---|---|---|
-| GET | `/health` | Kiểm tra API hoạt động |
+**Login Response:**
+```json
+{
+  "userId": "guid",
+  "username": "string",
+  "email": "string",
+  "token": "jwt-token",
+  "role": "User | Admin"
+}
+```
 
 ---
 
-## 🔐 Authentication & Authorization
+### ?? Products � `/api/products`
+
+| Method | Endpoint | Auth | M� t? |
+|---|---|---|---|
+| GET | `/api/products` | ? | Danh s�ch s?n ph?m **?� duy?t** (Approved) |
+| GET | `/api/products/{id}` | ? | Chi ti?t s?n ph?m |
+| POST | `/api/products` | ?? User | ??ng b�n s?n ph?m (status = Pending) |
+| PUT | `/api/products/{id}` | ?? Owner | C?p nh?t s?n ph?m (reset ? Pending) |
+| DELETE | `/api/products/{id}` | ?? Owner | X�a s?n ph?m |
+| GET | `/api/products/mine` | ?? User | S?n ph?m c?a t�i (m?i status) |
+| GET | `/api/products/pending` | ?? Admin | S?n ph?m ch? duy?t |
+| GET | `/api/products/admin/all` | ?? Admin | T?t c? s?n ph?m (m?i status) |
+| PATCH | `/api/products/{id}/approve` | ?? Admin | Duy?t s?n ph?m |
+| PATCH | `/api/products/{id}/reject` | ?? Admin | T? ch?i s?n ph?m |
+
+**Product Response:**
+```json
+{
+  "id": "guid",
+  "name": "Gi�o tr�nh To�n cao c?p",
+  "description": "S�ch m?i 95%...",
+  "price": 50000,
+  "imageUrl": "https://...",
+  "imageUrls": ["https://...", "https://..."],
+  "category": "Gi�o Tr�nh",
+  "categoryName": "Gi�o Tr�nh",
+  "condition": "Nh? m?i (95%)",
+  "contactNote": "G?p t?i th? vi?n...",
+  "sellerId": "guid",
+  "sellerName": "nguyenvana",
+  "status": "Pending | Approved | Rejected",
+  "averageRating": 4.5,
+  "reviewCount": 12,
+  "createdAt": "2025-01-01T00:00:00Z"
+}
+```
+
+**Create Product Request:**
+```json
+{
+  "name": "Gi�o tr�nh To�n cao c?p",
+  "category": "Gi�o Tr�nh",
+  "condition": "Nh? m?i (95%)",
+  "price": 50000,
+  "description": "S�ch m?i 95%, kh�ng ghi ch�...",
+  "contactNote": "G?p t?i th? vi?n tr??ng",
+  "imageUrl": "https://...",
+  "imageUrls": ["https://...", "https://..."]
+}
+```
+
+---
+
+### ?? Categories � `/api/categories`
+
+| Method | Endpoint | Auth | M� t? |
+|---|---|---|---|
+| GET | `/api/categories` | ? | Danh s�ch danh m?c |
+| GET | `/api/categories/{id}` | ? | Chi ti?t danh m?c |
+| POST | `/api/categories` | ?? Admin | T?o danh m?c |
+| PUT | `/api/categories/{id}` | ?? Admin | C?p nh?t danh m?c |
+| DELETE | `/api/categories/{id}` | ?? Admin | X�a danh m?c |
+
+---
+
+### ?? Transactions � `/api/transactions`
+
+**Status flow:**
+```
+Pending ? Accepted ? Meeting ? Completed
+       ? Rejected
+       ? Cancelled
+       ? AutoCompleted (timeout)
+```
+
+| Method | Endpoint | Auth | M� t? |
+|---|---|---|---|
+| POST | `/api/transactions` | ?? User | T?o y�u c?u mua |
+| GET | `/api/transactions` | ?? User | T?t c? giao d?ch |
+| GET | `/api/transactions/mine` | ?? User | Giao d?ch c?a t�i (buyer ho?c seller) |
+| GET | `/api/transactions/{id}` | ?? User | Chi ti?t giao d?ch |
+| PATCH | `/api/transactions/{id}/status` | ?? User | C?p nh?t tr?ng th�i |
+| POST | `/api/transactions/{id}/otp` | ?? User | T?o m� OTP x�c nh?n g?p m?t |
+| POST | `/api/transactions/{id}/verify-otp` | ?? User | X�c minh m� OTP |
+| POST | `/api/transactions/{id}/confirm` | ?? User | X�c nh?n ?� nh?n h�ng |
+
+**Transaction Response:**
+```json
+{
+  "id": "guid",
+  "buyer": { "id": "guid", "username": "buyer1", "email": "..." },
+  "seller": { "id": "guid", "username": "seller1", "email": "..." },
+  "product": { "id": "guid", "name": "S�ch ABC", "price": 50000, "imageUrl": "..." },
+  "amount": 50000,
+  "status": "Pending",
+  "createdAt": "2025-01-01T00:00:00Z"
+}
+```
+
+**Create Transaction Request:**
+```json
+{
+  "productId": "guid",
+  "sellerId": "guid",
+  "amount": 50000
+}
+```
+
+---
+
+### ?? Messages � `/api/transactions/{id}/messages`
+
+| Method | Endpoint | Auth | M� t? |
+|---|---|---|---|
+| GET | `/api/transactions/{id}/messages` | ?? User | L?ch s? chat c?a giao d?ch |
+| POST | `/api/transactions/{id}/messages` | ?? User | G?i tin nh?n |
+
+**Message Response:**
+```json
+{
+  "id": "guid",
+  "transactionId": "guid",
+  "senderId": "guid",
+  "senderName": "nguyenvana",
+  "content": "B?n ?i mai g?p ? th? vi?n nh�!",
+  "createdAt": "2025-01-01T00:00:00Z"
+}
+```
+
+---
+
+### ? Reviews � `/api/reviews`
+
+| Method | Endpoint | Auth | M� t? |
+|---|---|---|---|
+| POST | `/api/reviews` | ?? User | Vi?t ?�nh gi� |
+| GET | `/api/reviews` | ? | T?t c? ?�nh gi� |
+| GET | `/api/reviews/{id}` | ?? User | Chi ti?t ?�nh gi� |
+| GET | `/api/reviews/product/{productId}` | ? | ?�nh gi� theo s?n ph?m |
+| GET | `/api/reviews/transaction/{transactionId}` | ? | ?�nh gi� theo giao d?ch |
+| DELETE | `/api/reviews/{id}` | ?? Owner | X�a ?�nh gi� |
+
+---
+
+### ?? Admin � `/api/admin`
+
+| Method | Endpoint | Auth | M� t? |
+|---|---|---|---|
+| GET | `/api/admin/stats` | ?? Admin | Dashboard th?ng k� t?ng quan |
+| GET | `/api/admin/users` | ?? Admin | Danh s�ch t?t c? ng??i d�ng |
+
+**Dashboard Stats Response:**
+```json
+{
+  "totalUsers": 150,
+  "totalProducts": 320,
+  "pendingProducts": 12,
+  "totalTransactions": 89,
+  "totalRevenue": 4500000
+}
+```
+
+---
+
+## ?? Authentication & Authorization
 
 ### JWT Flow
 
-1. Gọi `POST /api/auth/login` → nhận `token`
-2. Gửi token trong header: `Authorization: Bearer <token>`
-3. Swagger UI hỗ trợ nhập token trực tiếp (nút 🔓 Authorize)
+1. G?i `POST /api/auth/login` ? nh?n `token`
+2. G?i token trong header: `Authorization: Bearer <token>`
+3. Swagger UI h? tr? nh?p token tr?c ti?p (n�t ?? Authorize)
 
 ### Roles
 
-| Role | Quyền |
+| Role | Quy?n |
 |---|---|
-| **User** | CRUD sản phẩm / review của mình, tạo giao dịch |
-| **Admin** | Toàn bộ quyền User + CRUD danh mục |
-
-### Policies
-
-- `AdminOnly` – Chỉ Admin
-- `UserOrAdmin` – User hoặc Admin
+| **User** | ??ng b�n s?n ph?m, mua h�ng, chat, ?�nh gi�, qu?n l� s?n ph?m / giao d?ch c?a m�nh |
+| **Admin** | To�n b? quy?n User + Duy?t / t? ch?i s?n ph?m + CRUD danh m?c + Xem th?ng k� + Qu?n l� ng??i d�ng |
 
 ---
 
-## ✅ Validation
+## ?? Admin � Duy?t s?n ph?m
 
-Sử dụng **FluentValidation** tự động validate request:
+### Lu?ng ho?t ??ng
+
+```
+User ??ng s?n ph?m ??? Status: Pending
+                            ?
+                    Admin xem /products/pending
+                            ?
+                   ???????????????????
+                   ?                 ?
+          PATCH /approve       PATCH /reject
+          Status: Approved     Status: Rejected
+                   ?
+                   ?
+        Hi?n th? tr�n GET /products (public)
+```
+
+- **User ??ng b�n** ? s?n ph?m c� status `Pending`
+- **Ch? s?n ph?m `Approved`** m?i hi?n th? cho public (`GET /api/products`)
+- **Admin duy?t** ? `PATCH /api/products/{id}/approve`
+- **Admin t? ch?i** ? `PATCH /api/products/{id}/reject`
+- **User s?a s?n ph?m** ? status reset v? `Pending` (c?n duy?t l?i)
+
+---
+
+## ? Validation
+
+S? d?ng **FluentValidation** t? ??ng validate request:
 
 | Request | Rules |
 |---|---|
-| `RegisterRequest` | Username 3–50 ký tự, Email hợp lệ, Password 6–100 ký tự |
-| `LoginRequest` | Email hợp lệ, Password bắt buộc |
-| `CreateProductRequest` | Name bắt buộc (max 200), Price > 0 |
-| `UpdateProductRequest` | Name bắt buộc (max 200), Price > 0 |
-| `CreateCategoryRequest` | Name bắt buộc (max 100) |
-| `CreateReviewRequest` | ProductId bắt buộc, Rating 1–5, Content bắt buộc (max 1000) |
-| `CreateTransactionRequest` | SellerId bắt buộc, Amount > 0 |
-| `UpdateTransactionStatusRequest` | Status: Pending / Accepted / Completed / Cancelled |
+| `RegisterRequest` | Username 3�50 k� t?, Email h?p l?, Password 6�100 k� t? |
+| `LoginRequest` | Email h?p l?, Password b?t bu?c |
+| `CreateProductRequest` | Name b?t bu?c (5�150 k� t?), Price > 0 & ? 10.000.000, Description ? 20 k� t? |
+| `UpdateProductRequest` | Name b?t bu?c (5�150 k� t?), Price > 0 & ? 10.000.000, Description ? 20 k� t? |
+| `CreateCategoryRequest` | Name b?t bu?c (max 100) |
+| `CreateReviewRequest` | ProductId b?t bu?c, Rating 1�5, Content b?t bu?c (max 1000) |
+| `CreateTransactionRequest` | ProductId b?t bu?c, SellerId b?t bu?c, Amount > 0 |
+| `UpdateTransactionStatusRequest` | Status h?p l? |
 
 ---
 
-## 🗄 Database Schema
+## ?? Database Schema
 
 ### Users
 
-| Column | Type | Ghi chú |
+| Column | Type | Ghi ch� |
 |---|---|---|
 | Id | GUID | PK |
 | Username | nvarchar | |
-| Email | nvarchar | |
+| Email | nvarchar | Unique |
 | PasswordHash | nvarchar | BCrypt |
 | Role | nvarchar(20) | User / Admin |
+| Avatar | nvarchar | Nullable |
+| Bio | nvarchar | Nullable |
 | CreatedAt | datetime | |
 
 ### Products
 
-| Column | Type | Ghi chú |
+| Column | Type | Ghi ch� |
 |---|---|---|
 | Id | GUID | PK |
 | Name | nvarchar | |
 | Description | nvarchar | Nullable |
 | Price | decimal(18,2) | |
 | ImageUrl | nvarchar | Nullable |
-| CategoryId | int | FK → Categories, Nullable, SetNull on delete |
-| UserId | GUID | FK → Users |
+| ImageUrls | nvarchar | JSON array, Nullable |
+| Category | nvarchar | T�n danh m?c (string) |
+| Condition | nvarchar | T�nh tr?ng s�ch |
+| ContactNote | nvarchar | Ghi ch� li�n h? |
+| CategoryId | int | FK ? Categories, Nullable |
+| UserId | GUID | FK ? Users |
+| Status | nvarchar(20) | Pending / Approved / Rejected |
 | CreatedAt | datetime | |
 
 ### Categories
 
-| Column | Type | Ghi chú |
+| Column | Type | Ghi ch� |
 |---|---|---|
 | Id | int | PK, Identity |
 | Name | nvarchar | |
 
 ### Transactions
 
-| Column | Type | Ghi chú |
+| Column | Type | Ghi ch� |
 |---|---|---|
 | Id | GUID | PK |
-| BuyerId | GUID | FK → Users (NoAction) |
-| SellerId | GUID | FK → Users (NoAction) |
+| ProductId | GUID | FK ? Products (NoAction) |
+| BuyerId | GUID | FK ? Users (NoAction) |
+| SellerId | GUID | FK ? Users (NoAction) |
 | Amount | decimal(18,2) | |
-| Status | nvarchar(20) | Pending / Accepted / Completed / Cancelled |
+| Status | nvarchar(20) | Pending / Accepted / Meeting / Completed / AutoCompleted / Rejected / Cancelled / Disputed |
+| OtpCode | nvarchar | Nullable |
+| OtpExpiresAt | datetime | Nullable |
 | CreatedAt | datetime | |
 
 ### Reviews
 
-| Column | Type | Ghi chú |
+| Column | Type | Ghi ch� |
 |---|---|---|
 | Id | GUID | PK |
-| UserId | GUID | FK → Users (NoAction) |
-| ProductId | GUID | FK → Products (Cascade) |
-| Rating | int | 1–5 |
+| UserId | GUID | FK ? Users (NoAction) |
+| ProductId | GUID | FK ? Products (Cascade) |
+| Rating | int | 1�5 |
+| Content | nvarchar | |
+| CreatedAt | datetime | |
+
+### Messages
+
+| Column | Type | Ghi ch� |
+|---|---|---|
+| Id | GUID | PK |
+| TransactionId | GUID | FK ? Transactions (Cascade) |
+| SenderId | GUID | FK ? Users (NoAction) |
 | Content | nvarchar | |
 | CreatedAt | datetime | |
 
 ---
 
-## 🧪 Unit Tests
+## ?? Seed Data
 
-```bash
-cd EduCycle.Tests
-dotnet test
-```
+Migration t? ??ng t?o d? li?u m?c ??nh:
 
-**16 tests** – tất cả pass:
-
-| Test Class | Tests | Mô tả |
-|---|---|---|
-| `AuthServiceTests` | 5 | Register OK, email trùng, login đúng / sai, user not found |
-| `ProductServiceTests` | 11 | Create, GetById (found / not found), GetAll (có / rỗng), Update (owner / not owner / not found), Delete (owner / not owner / not found) |
-
----
-
-## 🌱 Seed Data
-
-Migration tự động tạo tài khoản Admin:
+### T�i kho?n Admin
 
 | Field | Value |
 |---|---|
 | Email | `admin@educycle.com` |
-| Password | `Admin@123` |
+| Password | `admin@admin` |
 | Role | Admin |
+
+### Danh m?c m?c ??nh
+
+| Id | Name |
+|---|---|
+| 1 | Gi�o Tr�nh |
+| 2 | S�ch Chuy�n Ng�nh |
+| 3 | T�i Li?u �n Thi |
+| 4 | D?ng C? H?c T?p |
+| 5 | Ngo?i Ng? |
+| 6 | Kh�c |
 
 ---
 
-## 🔧 Error Response Format
+## ?? Error Response Format
 
-Tất cả lỗi trả về cùng format:
+T?t c? l?i tr? v? c�ng format:
 
 ```json
 {
@@ -328,25 +480,59 @@ Tất cả lỗi trả về cùng format:
 }
 ```
 
-| HTTP Code | Exception | Khi nào |
+| HTTP Code | Exception | Khi n�o |
 |---|---|---|
-| 400 | `BadRequestException` | Request không hợp lệ |
+| 400 | `BadRequestException` | Request kh�ng h?p l? |
 | 400 | `ValidationException` | FluentValidation fail |
-| 401 | `UnauthorizedException` | Sai credentials / không có quyền |
-| 404 | `NotFoundException` | Không tìm thấy resource |
-| 500 | `Exception` | Lỗi server không xác định |
+| 401 | `UnauthorizedException` | Sai credentials / kh�ng c� quy?n |
+| 404 | `NotFoundException` | Kh�ng t�m th?y resource |
+| 500 | `Exception` | L?i server kh�ng x�c ??nh |
 
 ---
 
-## 📝 Development Rules
+## ?? Development Rules
 
 - Feature-based branching (`feature/xxx`, `fix/xxx`)
-- Hoàn thành feature → commit → push → rồi mới làm feature tiếp
-- Không commit trực tiếp vào `main`
-- Merge vào `dev` trước khi lên `main`
+- Ho�n th�nh feature ? commit ? push ? r?i m?i l�m feature ti?p
+- Kh�ng commit tr?c ti?p v�o `main`
+- Merge v�o `dev` tr??c khi l�n `main`
 
 ---
 
-## 📄 License
+## ?? Frontend ? Backend API Mapping
+
+| Frontend (endpoints.js) | Backend API | Status |
+|---|---|---|
+| `authApi.register(data)` | `POST /api/auth/register` | ? |
+| `authApi.login(data)` | `POST /api/auth/login` | ? |
+| `productsApi.getAll(params)` | `GET /api/products` | ? |
+| `productsApi.getById(id)` | `GET /api/products/{id}` | ? |
+| `productsApi.create(data)` | `POST /api/products` | ? |
+| `productsApi.update(id, data)` | `PUT /api/products/{id}` | ? |
+| `productsApi.delete(id)` | `DELETE /api/products/{id}` | ? |
+| `productsApi.getMyProducts()` | `GET /api/products/mine` | ? |
+| `categoriesApi.getAll()` | `GET /api/categories` | ? |
+| `categoriesApi.create(data)` | `POST /api/categories` | ? |
+| `categoriesApi.update(id, data)` | `PUT /api/categories/{id}` | ? |
+| `categoriesApi.delete(id)` | `DELETE /api/categories/{id}` | ? |
+| `transactionsApi.getAll()` | `GET /api/transactions` | ? |
+| `transactionsApi.getMyTransactions()` | `GET /api/transactions/mine` | ? |
+| `transactionsApi.getById(id)` | `GET /api/transactions/{id}` | ? |
+| `transactionsApi.create(data)` | `POST /api/transactions` | ? |
+| `transactionsApi.updateStatus(id, data)` | `PATCH /api/transactions/{id}/status` | ? |
+| `transactionsApi.generateOtp(id)` | `POST /api/transactions/{id}/otp` | ? |
+| `transactionsApi.verifyOtp(id, data)` | `POST /api/transactions/{id}/verify-otp` | ? |
+| `transactionsApi.confirmReceipt(id)` | `POST /api/transactions/{id}/confirm` | ? |
+| `messagesApi.getByTransaction(id)` | `GET /api/transactions/{id}/messages` | ? |
+| `messagesApi.send(id, data)` | `POST /api/transactions/{id}/messages` | ? |
+| `reviewsApi.getAll()` | `GET /api/reviews` | ? |
+| `reviewsApi.create(data)` | `POST /api/reviews` | ? |
+| `reviewsApi.delete(id)` | `DELETE /api/reviews/{id}` | ? |
+| `reviewsApi.getByTransaction(id)` | `GET /api/reviews/transaction/{id}` | ? |
+| `reviewsApi.getByProduct(id)` | `GET /api/reviews/product/{id}` | ? |
+
+---
+
+## ?? License
 
 MIT
