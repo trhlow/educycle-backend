@@ -4,6 +4,7 @@ using EduCycle.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduCycle.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260214134606_FixSeedDataStaticHash")]
+    partial class FixSeedDataStaticHash
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,66 +40,6 @@ namespace EduCycle.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Giáo Trình"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Sách Chuyên Ngành"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Tài Liệu Ôn Thi"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Dụng Cụ Học Tập"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Ngoại Ngữ"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Khác"
-                        });
-                });
-
-            modelBuilder.Entity("EduCycle.Domain.Entities.Message", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TransactionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SenderId");
-
-                    b.HasIndex("TransactionId");
-
-                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("EduCycle.Domain.Entities.Product", b =>
@@ -105,17 +48,8 @@ namespace EduCycle.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Condition")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactNote")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -126,9 +60,6 @@ namespace EduCycle.Api.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUrls")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -136,11 +67,6 @@ namespace EduCycle.Api.Migrations
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -201,15 +127,6 @@ namespace EduCycle.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("OtpCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("OtpExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("SellerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -222,8 +139,6 @@ namespace EduCycle.Api.Migrations
 
                     b.HasIndex("BuyerId");
 
-                    b.HasIndex("ProductId");
-
                     b.HasIndex("SellerId");
 
                     b.ToTable("Transactions");
@@ -234,12 +149,6 @@ namespace EduCycle.Api.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Avatar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -271,29 +180,10 @@ namespace EduCycle.Api.Migrations
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@educycle.com",
-                            PasswordHash = "$2a$11$TCvAEG19aKWyzD9V1qllquNigqoIj3mT3Ihpviy0HRIP3wQRErAVK",
+                            PasswordHash = "$2a$11$8bHsTyPgE.P/CB7rCNvgbeW5/Nw5iH1RwaOkKogQLdJAnlFAGAyaa",
                             Role = "Admin",
                             Username = "admin"
                         });
-                });
-
-            modelBuilder.Entity("EduCycle.Domain.Entities.Message", b =>
-                {
-                    b.HasOne("EduCycle.Domain.Entities.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("EduCycle.Domain.Entities.Transaction", "Transaction")
-                        .WithMany()
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Sender");
-
-                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("EduCycle.Domain.Entities.Product", b =>
@@ -339,12 +229,6 @@ namespace EduCycle.Api.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("EduCycle.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("EduCycle.Domain.Entities.User", "Seller")
                         .WithMany()
                         .HasForeignKey("SellerId")
@@ -352,8 +236,6 @@ namespace EduCycle.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Buyer");
-
-                    b.Navigation("Product");
 
                     b.Navigation("Seller");
                 });
