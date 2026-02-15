@@ -6,6 +6,9 @@ public class Transaction
 {
     public Guid Id { get; set; }
 
+    public Guid ProductId { get; set; }
+    public Product Product { get; set; } = null!;
+
     public Guid BuyerId { get; set; }
     public User Buyer { get; set; } = null!;
 
@@ -14,5 +17,7 @@ public class Transaction
 
     public decimal Amount { get; set; }
     public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
+    public string? OtpCode { get; set; }
+    public DateTime? OtpExpiresAt { get; set; }
     public DateTime CreatedAt { get; set; }
 }
