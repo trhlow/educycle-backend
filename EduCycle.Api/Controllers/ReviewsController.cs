@@ -38,6 +38,20 @@ public class ReviewsController : ControllerBase
         return Ok(await _service.GetAllAsync());
     }
 
+    [AllowAnonymous]
+    [HttpGet("transaction/{transactionId:guid}")]
+    public async Task<IActionResult> GetByTransaction(Guid transactionId)
+    {
+        return Ok(await _service.GetByProductIdAsync(transactionId));
+    }
+
+    [AllowAnonymous]
+    [HttpGet("product/{productId:guid}")]
+    public async Task<IActionResult> GetByProduct(Guid productId)
+    {
+        return Ok(await _service.GetByProductIdAsync(productId));
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
