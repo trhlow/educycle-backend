@@ -21,12 +21,26 @@ public class ReviewRepository : IReviewRepository
 
     public async Task<Review?> GetByIdAsync(Guid id)
     {
-        return await _context.Reviews.FindAsync(id);
+        return await _context.Reviews
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<List<Review>> GetAllAsync()
     {
-        return await _context.Reviews.AsNoTracking().ToListAsync();
+        return await _context.Reviews
+            .Include(r => r.User)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<List<Review>> GetByProductIdAsync(Guid productId)
+    {
+        return await _context.Reviews
+            .Include(r => r.User)
+            .Where(r => r.ProductId == productId)
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task DeleteAsync(Review review)

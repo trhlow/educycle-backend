@@ -14,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<Message> Messages => Set<Message>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,6 +47,12 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Transaction>()
+            .HasOne(t => t.Product)
+            .WithMany()
+            .HasForeignKey(t => t.ProductId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Transaction>()
             .Property(t => t.Status)
             .HasConversion<string>()
             .HasMaxLength(20);
@@ -57,6 +64,33 @@ public class ApplicationDbContext : DbContext
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.User)
+            .WithMany()
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ===== PRODUCT STATUS =====
+
+        modelBuilder.Entity<Product>()
+            .Property(p => p.Status)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        // ===== MESSAGE =====
+
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Transaction)
+            .WithMany()
+            .HasForeignKey(m => m.TransactionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Sender)
+            .WithMany()
+            .HasForeignKey(m => m.SenderId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         // ===== DECIMAL PRECISION =====
 
@@ -82,9 +116,20 @@ public class ApplicationDbContext : DbContext
             Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
             Username = "admin",
             Email = "admin@educycle.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+            PasswordHash = "$2a$11$TCvAEG19aKWyzD9V1qllquNigqoIj3mT3Ihpviy0HRIP3wQRErAVK",
             Role = Role.Admin,
             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
         });
+
+        // ===== SEED CATEGORIES =====
+
+        modelBuilder.Entity<Category>().HasData(
+            new Category { Id = 1, Name = "Giáo Trình" },
+            new Category { Id = 2, Name = "Sách Chuyên Ngành" },
+            new Category { Id = 3, Name = "Tài Liệu Ôn Thi" },
+            new Category { Id = 4, Name = "Dụng Cụ Học Tập" },
+            new Category { Id = 5, Name = "Ngoại Ngữ" },
+            new Category { Id = 6, Name = "Khác" }
+        );
     }
 }
