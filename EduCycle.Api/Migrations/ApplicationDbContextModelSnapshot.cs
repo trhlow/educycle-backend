@@ -271,7 +271,7 @@ namespace EduCycle.Api.Migrations
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@educycle.com",
-                            PasswordHash = "$2a$11$TCvAEG19aKWyzD9V1qllquNigqoIj3mT3Ihpviy0HRIP3wQRErAVK",
+                            PasswordHash = "$2a$11$vI8aWBnW3fID.ixJCRy.qOhMkGh/.WY6g9E7KO0OLfZNPq9i0jq9y",
                             Role = "Admin",
                             Username = "admin"
                         });
