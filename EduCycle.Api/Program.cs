@@ -1,4 +1,4 @@
-﻿using EduCycle.Api.Middleware;
+using EduCycle.Api.Middleware;
 using EduCycle.Application.Interfaces;
 using EduCycle.Application.Services;
 using EduCycle.Infrastructure.Authentication;
@@ -135,5 +135,19 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
+
+// Dev-only: Reset admin password hash (fix BCrypt verification)
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var admin = await db.Users.FindAsync(Guid.Parse("00000000-0000-0000-0000-000000000001"));
+    if (admin != null)
+    {
+        admin.PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin@1");
+        await db.SaveChangesAsync();
+        app.Logger.LogInformation("Admin password reset to admin@1 (dev only)");
+    }
+}
 
 app.Run();
