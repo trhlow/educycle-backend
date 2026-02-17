@@ -452,7 +452,7 @@ Migration t? ??ng t?o d? li?u m?c ??nh:
 | Field | Value |
 |---|---|
 | Email | `admin@educycle.com` |
-| Password | `admin@admin` |
+| Password | `admin@1` |
 | Role | Admin |
 
 ### Danh m?c m?c ??nh
