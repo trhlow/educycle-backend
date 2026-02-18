@@ -65,4 +65,43 @@ public class AuthService : IAuthService
             Role = user.Role.ToString()
         };
     }
+
+    public async Task<AuthResponse> SocialLoginAsync(SocialLoginRequest request)
+    {
+        // Map provider to a demo email (in production, validate OAuth token)
+        var email = request.Provider?.ToLower() switch
+        {
+            "microsoft" => "student@university.edu.vn",
+            "google" => "student@gmail.com",
+            "facebook" => "student@facebook.com",
+            _ => throw new BadRequestException($"Unsupported provider: {request.Provider}")
+        };
+
+        var username = email.Split('@')[0];
+
+        // Find existing user or create new one
+        var user = await _userRepository.GetByEmailAsync(email);
+        if (user == null)
+        {
+            user = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = username,
+                Email = email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
+                Role = Role.User,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _userRepository.AddAsync(user);
+        }
+
+        return new AuthResponse
+        {
+            UserId = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Token = _jwtTokenGenerator.GenerateToken(user),
+            Role = user.Role.ToString()
+        };
+    }
 }

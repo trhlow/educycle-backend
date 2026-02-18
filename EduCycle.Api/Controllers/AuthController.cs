@@ -26,4 +26,10 @@ public class AuthController : ControllerBase
     {
         return Ok(await _authService.LoginAsync(request));
     }
+
+    [HttpPost("social-login")]
+    public async Task<IActionResult> SocialLogin(SocialLoginRequest request)
+    {
+        return Ok(await _authService.SocialLoginAsync(request));
+    }
 }
