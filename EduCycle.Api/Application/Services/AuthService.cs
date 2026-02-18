@@ -104,4 +104,18 @@ public class AuthService : IAuthService
             Role = user.Role.ToString()
         };
     }
+
+    public async Task<bool> VerifyPhoneAsync(Guid userId, VerifyPhoneRequest request)
+    {
+        var user = await _userRepository.GetByIdAsync(userId)
+            ?? throw new BadRequestException("User not found");
+
+        // In production, validate OTP via SMS provider (Twilio, etc.)
+        // For dev/demo, accept any OTP
+        user.Phone = request.Phone;
+        user.PhoneVerified = true;
+        await _userRepository.UpdateAsync(user);
+
+        return true;
+    }
 }

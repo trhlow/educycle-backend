@@ -1,6 +1,8 @@
 using EduCycle.Application.Interfaces;
 using EduCycle.Contracts.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EduCycle.Api.Controllers;
 
@@ -31,5 +33,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> SocialLogin(SocialLoginRequest request)
     {
         return Ok(await _authService.SocialLoginAsync(request));
+    }
+
+    [Authorize]
+    [HttpPost("verify-phone")]
+    public async Task<IActionResult> VerifyPhone(VerifyPhoneRequest request)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _authService.VerifyPhoneAsync(userId, request);
+        return Ok(new { success = result });
     }
 }

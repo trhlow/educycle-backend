@@ -11,5 +11,7 @@ public class User
     public Role Role { get; set; } = Role.User;
     public string? Avatar { get; set; }
     public string? Bio { get; set; }
+    public string? Phone { get; set; }
+    public bool PhoneVerified { get; set; }
     public DateTime CreatedAt { get; set; }
 }
