@@ -52,6 +52,13 @@ public class ReviewsController : ControllerBase
         return Ok(await _service.GetByProductIdAsync(productId));
     }
 
+    [AllowAnonymous]
+    [HttpGet("user/{userId:guid}")]
+    public async Task<IActionResult> GetByUser(Guid userId)
+    {
+        return Ok(await _service.GetByTargetUserIdAsync(userId));
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

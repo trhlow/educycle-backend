@@ -1,0 +1,13 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+D:\educycle-backend\EduCycle.Api\Application\Services\TransactionService.cs(103,44): error CS0117: 'ProductStatus' does not contain a definition for 'Sold' [D:\educycle-backend\EduCycle.Api\EduCycle.Api.csproj]
+D:\educycle-backend\EduCycle.Api\Application\Services\TransactionService.cs(120,44): error CS0117: 'ProductStatus' does not contain a definition for 'Sold' [D:\educycle-backend\EduCycle.Api\EduCycle.Api.csproj]
+
+Build FAILED.
+
+D:\educycle-backend\EduCycle.Api\Application\Services\TransactionService.cs(103,44): error CS0117: 'ProductStatus' does not contain a definition for 'Sold' [D:\educycle-backend\EduCycle.Api\EduCycle.Api.csproj]
+D:\educycle-backend\EduCycle.Api\Application\Services\TransactionService.cs(120,44): error CS0117: 'ProductStatus' does not contain a definition for 'Sold' [D:\educycle-backend\EduCycle.Api\EduCycle.Api.csproj]
+    0 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:01.49

@@ -4,9 +4,10 @@ namespace EduCycle.Application.Interfaces;
 
 public interface IReviewService
 {
-    Task<ReviewResponse> CreateAsync(CreateReviewRequest request, Guid userId);
-    Task<ReviewResponse> GetByIdAsync(Guid id);
-    Task<List<ReviewResponse>> GetAllAsync();
-    Task<List<ReviewResponse>> GetByProductIdAsync(Guid productId);
+    Task<ReviewResponseDto> CreateAsync(CreateReviewRequest request, Guid userId);
+    Task<ReviewResponseDto> GetByIdAsync(Guid id);
+    Task<List<ReviewResponseDto>> GetAllAsync();
+    Task<List<ReviewResponseDto>> GetByProductIdAsync(Guid productId);
+    Task<List<ReviewResponseDto>> GetByTargetUserIdAsync(Guid userId);
     Task DeleteAsync(Guid id, Guid userId);
 }

@@ -170,11 +170,18 @@ public class ProductService : IProductService
             ContactNote = p.ContactNote,
             UserId = p.UserId,
             SellerId = p.UserId,
-            SellerName = p.User?.Username,
+            SellerName = MaskUsername(p.User?.Username),
             Status = p.Status.ToString(),
             AverageRating = Math.Round(avgRating, 1),
             ReviewCount = reviews?.Count ?? 0,
             CreatedAt = p.CreatedAt
         };
+    }
+
+    private static string MaskUsername(string? username)
+    {
+        if (string.IsNullOrEmpty(username)) return "Ngu***";
+        if (username.Length <= 3) return username + "***";
+        return username[..3] + "***" + username[^1];
     }
 }

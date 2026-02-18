@@ -2,6 +2,7 @@ using EduCycle.Application.Services;
 using EduCycle.Common.Exceptions;
 using EduCycle.Contracts.Products;
 using EduCycle.Domain.Entities;
+using EduCycle.Domain.Enums;
 using EduCycle.Infrastructure.Repositories;
 using Moq;
 
@@ -10,12 +11,15 @@ namespace EduCycle.Tests.Services;
 public class ProductServiceTests
 {
     private readonly Mock<IProductRepository> _repoMock;
+    private readonly Mock<IReviewRepository> _reviewRepoMock;
     private readonly ProductService _sut;
 
     public ProductServiceTests()
     {
         _repoMock = new Mock<IProductRepository>();
-        _sut = new ProductService(_repoMock.Object);
+        _reviewRepoMock = new Mock<IReviewRepository>();
+        _reviewRepoMock.Setup(r => r.GetByProductIdAsync(It.IsAny<Guid>())).ReturnsAsync(new List<Review>());
+        _sut = new ProductService(_repoMock.Object, _reviewRepoMock.Object);
     }
 
     // ===== CREATE =====
@@ -87,7 +91,7 @@ public class ProductServiceTests
             new() { Id = Guid.NewGuid(), Name = "P2", Price = 20, UserId = Guid.NewGuid(), CreatedAt = DateTime.UtcNow }
         };
 
-        _repoMock.Setup(r => r.GetAllAsync())
+        _repoMock.Setup(r => r.GetByStatusAsync(ProductStatus.Approved))
             .ReturnsAsync(products);
 
         var result = await _sut.GetAllAsync();
@@ -98,7 +102,7 @@ public class ProductServiceTests
     [Fact]
     public async Task GetAllAsync_ShouldReturnEmpty_WhenNoProducts()
     {
-        _repoMock.Setup(r => r.GetAllAsync())
+        _repoMock.Setup(r => r.GetByStatusAsync(ProductStatus.Approved))
             .ReturnsAsync([]);
 
         var result = await _sut.GetAllAsync();

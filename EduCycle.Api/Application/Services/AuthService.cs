@@ -69,13 +69,25 @@ public class AuthService : IAuthService
     public async Task<AuthResponse> SocialLoginAsync(SocialLoginRequest request)
     {
         // Map provider to a demo email (in production, validate OAuth token)
-        var email = request.Provider?.ToLower() switch
+        var email = request.Email; 
+        
+        // Use user provided email if available, otherwise mock based on provider
+        if (string.IsNullOrEmpty(email))
         {
-            "microsoft" => "student@university.edu.vn",
-            "google" => "student@gmail.com",
-            "facebook" => "student@facebook.com",
-            _ => throw new BadRequestException($"Unsupported provider: {request.Provider}")
-        };
+            email = request.Provider?.ToLower() switch
+            {
+                "microsoft" => "student@university.edu.vn",
+                "google" => "student@gmail.com",
+                "facebook" => "student@facebook.com",
+                _ => throw new BadRequestException($"Unsupported provider: {request.Provider}")
+            };
+        }
+        else if (request.Provider?.ToLower() == "microsoft" && !email.EndsWith(".edu.vn"))
+        {
+             // Optional: Enforce edu.vn for Microsoft if we want to be strict, 
+             // but user might use personal microsoft account.
+             // For now, let's allow it but prefer edu.vn for students.
+        }
 
         var username = email.Split('@')[0];
 

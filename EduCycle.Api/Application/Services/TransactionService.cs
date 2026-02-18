@@ -10,10 +10,14 @@ namespace EduCycle.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _repository;
+    private readonly IProductRepository _productRepository;
 
-    public TransactionService(ITransactionRepository repository)
+    public TransactionService(
+        ITransactionRepository repository,
+        IProductRepository productRepository)
     {
         _repository = repository;
+        _productRepository = productRepository;
     }
 
     public async Task<TransactionResponse> CreateAsync(CreateTransactionRequest request, Guid buyerId)
@@ -91,6 +95,14 @@ public class TransactionService : ITransactionService
         transaction.OtpExpiresAt = null;
         transaction.Status = TransactionStatus.Completed;
         await _repository.UpdateAsync(transaction);
+
+        // Auto-delete (mark as Sold) the product
+        var product = await _productRepository.GetByIdAsync(transaction.ProductId);
+        if (product != null)
+        {
+            product.Status = ProductStatus.Sold;
+            await _productRepository.UpdateAsync(product);
+        }
     }
 
     public async Task<TransactionResponse> ConfirmReceiptAsync(Guid id)
@@ -100,6 +112,14 @@ public class TransactionService : ITransactionService
 
         transaction.Status = TransactionStatus.Completed;
         await _repository.UpdateAsync(transaction);
+
+        // Auto-delete (mark as Sold) the product
+        var product = await _productRepository.GetByIdAsync(transaction.ProductId);
+        if (product != null)
+        {
+            product.Status = ProductStatus.Sold;
+            await _productRepository.UpdateAsync(product);
+        }
 
         return MapToResponse(transaction);
     }
