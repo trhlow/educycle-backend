@@ -148,6 +148,8 @@ public class TransactionService : ITransactionService
         } : null,
         Amount = t.Amount,
         Status = t.Status.ToString(),
+        BuyerConfirmed = t.BuyerConfirmed,
+        SellerConfirmed = t.SellerConfirmed,
         CreatedAt = t.CreatedAt
     };
 }

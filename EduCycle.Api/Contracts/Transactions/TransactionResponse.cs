@@ -8,6 +8,8 @@ public class TransactionResponse
     public TransactionProductDto? Product { get; set; }
     public decimal Amount { get; set; }
     public string Status { get; set; } = null!;
+    public bool BuyerConfirmed { get; set; }
+    public bool SellerConfirmed { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 

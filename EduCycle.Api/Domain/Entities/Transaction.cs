@@ -19,5 +19,7 @@ public class Transaction
     public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
     public string? OtpCode { get; set; }
     public DateTime? OtpExpiresAt { get; set; }
+    public bool BuyerConfirmed { get; set; }
+    public bool SellerConfirmed { get; set; }
     public DateTime CreatedAt { get; set; }
 }

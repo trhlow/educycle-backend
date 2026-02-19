@@ -78,6 +78,7 @@ public class ReviewService : IReviewService
         Id = r.Id,
         UserId = r.UserId,
         Username = MaskUsername(r.User?.Username),
+        ReviewerName = MaskUsername(r.User?.Username),
         ProductId = r.ProductId,
         TargetUserId = r.TargetUserId,
         TransactionId = r.TransactionId,
