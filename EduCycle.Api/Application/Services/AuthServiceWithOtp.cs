@@ -1,4 +1,4 @@
-﻿using EduCycle.Application.Interfaces;
+using EduCycle.Application.Interfaces;
 using EduCycle.Common.Exceptions;
 using EduCycle.Contracts.Auth;
 using EduCycle.Domain.Entities;
@@ -8,23 +8,29 @@ using EduCycle.Infrastructure.Repositories;
 
 namespace EduCycle.Application.Services;
 
-public class AuthService : IAuthService
+public class AuthServiceWithOtp : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IEmailService _emailService;
 
-    public AuthService(
+    public AuthServiceWithOtp(
         IUserRepository userRepository,
-        IJwtTokenGenerator jwtTokenGenerator)
+        IJwtTokenGenerator jwtTokenGenerator,
+        IEmailService emailService)
     {
         _userRepository = userRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
         if (await _userRepository.ExistsByEmailAsync(request.Email))
             throw new BadRequestException("Email already exists");
+
+        // Generate 6-digit OTP
+        var otp = new Random().Next(100000, 999999).ToString();
 
         var user = new User
         {
@@ -33,10 +39,23 @@ public class AuthService : IAuthService
             Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             Role = Role.User,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            IsEmailVerified = false,
+            EmailVerificationToken = otp,
+            EmailVerificationTokenExpiry = DateTime.UtcNow.AddMinutes(5)
         };
 
         await _userRepository.AddAsync(user);
+
+        // Send OTP email (fire-and-forget with error logging)
+        try
+        {
+            await _emailService.SendOtpEmailAsync(user.Email, otp);
+        }
+        catch
+        {
+            // Log but don't fail registration — user can resend OTP
+        }
 
         return new AuthResponse
         {
@@ -44,7 +63,9 @@ public class AuthService : IAuthService
             Username = user.Username,
             Email = user.Email,
             Token = _jwtTokenGenerator.GenerateToken(user),
-            Role = user.Role.ToString()
+            Role = user.Role.ToString(),
+            IsEmailVerified = false,
+            Message = "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản."
         };
     }
 
@@ -62,16 +83,15 @@ public class AuthService : IAuthService
             Username = user.Username,
             Email = user.Email,
             Token = _jwtTokenGenerator.GenerateToken(user),
-            Role = user.Role.ToString()
+            Role = user.Role.ToString(),
+            IsEmailVerified = user.IsEmailVerified
         };
     }
 
     public async Task<AuthResponse> SocialLoginAsync(SocialLoginRequest request)
     {
-        // Map provider to a demo email (in production, validate OAuth token)
-        var email = request.Email; 
-        
-        // Use user provided email if available, otherwise mock based on provider
+        var email = request.Email;
+
         if (string.IsNullOrEmpty(email))
         {
             email = request.Provider?.ToLower() switch
@@ -82,16 +102,9 @@ public class AuthService : IAuthService
                 _ => throw new BadRequestException($"Unsupported provider: {request.Provider}")
             };
         }
-        else if (request.Provider?.ToLower() == "microsoft" && !email.EndsWith(".edu.vn"))
-        {
-             // Optional: Enforce edu.vn for Microsoft if we want to be strict, 
-             // but user might use personal microsoft account.
-             // For now, let's allow it but prefer edu.vn for students.
-        }
 
         var username = email.Split('@')[0];
 
-        // Find existing user or create new one
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null)
         {
@@ -102,8 +115,18 @@ public class AuthService : IAuthService
                 Email = email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
                 Role = Role.User,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                IsEmailVerified = true // OAuth users are verified
             };
+
+            // Set provider ID
+            switch (request.Provider?.ToLower())
+            {
+                case "google": user.GoogleId = request.ProviderId ?? Guid.NewGuid().ToString(); break;
+                case "facebook": user.FacebookId = request.ProviderId ?? Guid.NewGuid().ToString(); break;
+                case "microsoft": user.MicrosoftId = request.ProviderId ?? Guid.NewGuid().ToString(); break;
+            }
+
             await _userRepository.AddAsync(user);
         }
 
@@ -113,7 +136,8 @@ public class AuthService : IAuthService
             Username = user.Username,
             Email = user.Email,
             Token = _jwtTokenGenerator.GenerateToken(user),
-            Role = user.Role.ToString()
+            Role = user.Role.ToString(),
+            IsEmailVerified = user.IsEmailVerified
         };
     }
 
@@ -129,13 +153,43 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public Task<bool> VerifyOtpAsync(VerifyOtpRequest request)
+    public async Task<bool> VerifyOtpAsync(VerifyOtpRequest request)
     {
-        throw new NotImplementedException("Use AuthServiceWithOtp for OTP support");
+        var user = await _userRepository.GetByEmailAsync(request.Email)
+            ?? throw new BadRequestException("User not found");
+
+        if (user.IsEmailVerified)
+            throw new BadRequestException("Email is already verified");
+
+        if (user.EmailVerificationToken != request.Otp)
+            throw new BadRequestException("Invalid OTP");
+
+        if (user.EmailVerificationTokenExpiry < DateTime.UtcNow)
+            throw new BadRequestException("OTP expired. Please request a new one.");
+
+        user.IsEmailVerified = true;
+        user.EmailVerificationToken = null;
+        user.EmailVerificationTokenExpiry = null;
+        await _userRepository.UpdateAsync(user);
+
+        return true;
     }
 
-    public Task<bool> ResendOtpAsync(ResendOtpRequest request)
+    public async Task<bool> ResendOtpAsync(ResendOtpRequest request)
     {
-        throw new NotImplementedException("Use AuthServiceWithOtp for OTP support");
+        var user = await _userRepository.GetByEmailAsync(request.Email)
+            ?? throw new BadRequestException("User not found");
+
+        if (user.IsEmailVerified)
+            throw new BadRequestException("Email is already verified");
+
+        var otp = new Random().Next(100000, 999999).ToString();
+        user.EmailVerificationToken = otp;
+        user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddMinutes(5);
+        await _userRepository.UpdateAsync(user);
+
+        await _emailService.SendOtpEmailAsync(user.Email, otp);
+
+        return true;
     }
 }

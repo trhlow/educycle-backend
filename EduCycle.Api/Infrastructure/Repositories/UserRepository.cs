@@ -1,4 +1,4 @@
-﻿using EduCycle.Domain.Entities;
+using EduCycle.Domain.Entities;
 using EduCycle.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,5 +43,21 @@ public class UserRepository : IUserRepository
     {
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
+    }
+
+    // OAuth methods
+    public async Task<User?> GetByGoogleIdAsync(string googleId)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
+    }
+
+    public async Task<User?> GetByFacebookIdAsync(string facebookId)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.FacebookId == facebookId);
+    }
+
+    public async Task<User?> GetByMicrosoftIdAsync(string microsoftId)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.MicrosoftId == microsoftId);
     }
 }

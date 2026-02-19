@@ -27,7 +27,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // ===== DI =====
 
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthServiceWithOtp>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -61,6 +62,24 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
+    options.CallbackPath = "/api/oauth/google-callback";
+})
+.AddFacebook(options =>
+{
+    options.AppId = builder.Configuration["Authentication:Facebook:AppId"] ?? "";
+    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"] ?? "";
+    options.CallbackPath = "/api/oauth/facebook-callback";
+})
+.AddMicrosoftAccount(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"] ?? "";
+    options.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"] ?? "";
+    options.CallbackPath = "/api/oauth/microsoft-callback";
 });
 
 // ===== AUTHORIZATION POLICIES =====

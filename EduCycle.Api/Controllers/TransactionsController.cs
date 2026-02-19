@@ -60,7 +60,7 @@ public class TransactionsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/verify-otp")]
-    public async Task<IActionResult> VerifyOtp(Guid id, [FromBody] VerifyOtpRequest request)
+    public async Task<IActionResult> VerifyOtp(Guid id, [FromBody] TransactionVerifyOtpRequest request)
     {
         await _service.VerifyOtpAsync(id, request.Otp);
         return Ok(new { message = "OTP verified successfully" });
@@ -88,7 +88,7 @@ public class TransactionsController : ControllerBase
     }
 }
 
-public class VerifyOtpRequest
+public class TransactionVerifyOtpRequest
 {
     public string Otp { get; set; } = null!;
 }

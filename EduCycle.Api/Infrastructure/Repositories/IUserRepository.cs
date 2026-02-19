@@ -1,4 +1,4 @@
-﻿using EduCycle.Domain.Entities;
+using EduCycle.Domain.Entities;
 
 namespace EduCycle.Infrastructure.Repositories;
 
@@ -10,4 +10,9 @@ public interface IUserRepository
     Task<bool> ExistsByEmailAsync(string email);
     Task AddAsync(User user);
     Task UpdateAsync(User user);
+
+    // OAuth methods
+    Task<User?> GetByGoogleIdAsync(string googleId);
+    Task<User?> GetByFacebookIdAsync(string facebookId);
+    Task<User?> GetByMicrosoftIdAsync(string microsoftId);
 }

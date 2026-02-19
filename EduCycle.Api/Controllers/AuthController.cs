@@ -35,6 +35,20 @@ public class AuthController : ControllerBase
         return Ok(await _authService.SocialLoginAsync(request));
     }
 
+    [HttpPost("verify-otp")]
+    public async Task<IActionResult> VerifyOtp(VerifyOtpRequest request)
+    {
+        var result = await _authService.VerifyOtpAsync(request);
+        return Ok(new { message = "Email verified successfully!" });
+    }
+
+    [HttpPost("resend-otp")]
+    public async Task<IActionResult> ResendOtp(ResendOtpRequest request)
+    {
+        var result = await _authService.ResendOtpAsync(request);
+        return Ok(new { message = "OTP resent successfully!" });
+    }
+
     [Authorize]
     [HttpPost("verify-phone")]
     public async Task<IActionResult> VerifyPhone(VerifyPhoneRequest request)

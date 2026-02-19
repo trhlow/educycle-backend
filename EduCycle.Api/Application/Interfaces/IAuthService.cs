@@ -8,4 +8,6 @@ public interface IAuthService
     Task<AuthResponse> LoginAsync(LoginRequest request);
     Task<AuthResponse> SocialLoginAsync(SocialLoginRequest request);
     Task<bool> VerifyPhoneAsync(Guid userId, VerifyPhoneRequest request);
+    Task<bool> VerifyOtpAsync(VerifyOtpRequest request);
+    Task<bool> ResendOtpAsync(ResendOtpRequest request);
 }
