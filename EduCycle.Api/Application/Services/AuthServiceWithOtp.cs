@@ -172,6 +172,16 @@ public class AuthServiceWithOtp : IAuthService
         user.EmailVerificationTokenExpiry = null;
         await _userRepository.UpdateAsync(user);
 
+        // Send welcome email (fire-and-forget)
+        try
+        {
+            await _emailService.SendWelcomeEmailAsync(user.Email, user.Username);
+        }
+        catch
+        {
+            // Don't fail verification if welcome email fails
+        }
+
         return true;
     }
 
